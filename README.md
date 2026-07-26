@@ -6,9 +6,10 @@ App mobile React Native (Expo) per tracciare le proprie escursioni.
 
 - Elenco delle escursioni salvate (nome, data, dislivello)
 - Aggiunta di una nuova escursione tramite il pulsante `+`
+- Possibilità di allegare una foto dalla galleria del telefono, con anteprima nella lista
 - Possibilità di segnare un'escursione come completata
 - Possibilità di cancellare un'escursione
-- Persistenza locale con AsyncStorage
+- Persistenza permanente sul dispositivo (dati con AsyncStorage, foto copiate nella cartella documenti dell'app)
 
 ## Avvio
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
 import { Escursione } from '../types/Escursione';
 
 interface Props {
@@ -17,6 +17,9 @@ function formattaData(data: string): string {
 export default function EscursioneItem({ escursione, onCompleta, onCancella }: Props) {
   return (
     <View style={[styles.card, escursione.completata && styles.cardCompletata]}>
+      {escursione.fotoUri && (
+        <Image source={{ uri: escursione.fotoUri }} style={styles.foto} />
+      )}
       <View style={styles.info}>
         <Text style={[styles.nome, escursione.completata && styles.testoCompletato]}>
           {escursione.nome}
@@ -65,6 +68,13 @@ const styles = StyleSheet.create({
   },
   cardCompletata: {
     backgroundColor: '#f0f6f0',
+  },
+  foto: {
+    width: 52,
+    height: 52,
+    borderRadius: 10,
+    marginRight: 12,
+    backgroundColor: '#eee',
   },
   info: {
     flex: 1,

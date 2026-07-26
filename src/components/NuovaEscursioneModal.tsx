@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 import {
   Modal,
   View,
@@ -8,6 +9,8 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Image,
+  Linking,
 } from 'react-native';
 import { Escursione } from '../types/Escursione';
 
@@ -25,18 +28,55 @@ export default function NuovaEscursioneModal({ visibile, onChiudi, onSalva }: Pr
   const [nome, setNome] = useState('');
   const [data, setData] = useState(dataOdierna());
   const [dislivello, setDislivello] = useState('');
+  const [fotoUri, setFotoUri] = useState<string | undefined>(undefined);
   const [errore, setErrore] = useState('');
+  const [erroreFoto, setErroreFoto] = useState('');
+  const [permessoNegatoDefinitivo, setPermessoNegatoDefinitivo] = useState(false);
 
   function resetForm() {
     setNome('');
     setData(dataOdierna());
     setDislivello('');
+    setFotoUri(undefined);
     setErrore('');
+    setErroreFoto('');
+    setPermessoNegatoDefinitivo(false);
   }
 
   function handleChiudi() {
     resetForm();
     onChiudi();
+  }
+
+  async function handleScegliFoto() {
+    setErroreFoto('');
+    setPermessoNegatoDefinitivo(false);
+
+    const permesso = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permesso.granted) {
+      if (permesso.canAskAgain) {
+        setErroreFoto("Permesso alla galleria negato. Riprova e concedi l'accesso per allegare una foto.");
+      } else {
+        setErroreFoto(
+          "Permesso alla galleria negato in modo permanente. Abilitalo dalle impostazioni del telefono per allegare una foto."
+        );
+        setPermessoNegatoDefinitivo(true);
+      }
+      return;
+    }
+
+    const risultato = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 0.7,
+    });
+
+    if (!risultato.canceled && risultato.assets[0]) {
+      setFotoUri(risultato.assets[0].uri);
+    }
+  }
+
+  function handleRimuoviFoto() {
+    setFotoUri(undefined);
   }
 
   function handleSalva() {
@@ -55,7 +95,7 @@ export default function NuovaEscursioneModal({ visibile, onChiudi, onSalva }: Pr
       return;
     }
 
-    onSalva({ nome: nomePulito, data, dislivello: dislivelloNum });
+    onSalva({ nome: nomePulito, data, dislivello: dislivelloNum, fotoUri });
     resetForm();
   }
 
@@ -95,6 +135,31 @@ export default function NuovaEscursioneModal({ visibile, onChiudi, onSalva }: Pr
             placeholderTextColor="#999"
             keyboardType="numeric"
           />
+
+          <Text style={styles.label}>Foto</Text>
+          {fotoUri ? (
+            <View style={styles.anteprimaRiga}>
+              <Image source={{ uri: fotoUri }} style={styles.anteprima} />
+              <Pressable style={styles.bottoneRimuoviFoto} onPress={handleRimuoviFoto}>
+                <Text style={styles.bottoneRimuoviFotoTesto}>Rimuovi foto</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <Pressable style={styles.bottoneFoto} onPress={handleScegliFoto}>
+              <Text style={styles.bottoneFotoTesto}>Scegli dalla galleria</Text>
+            </Pressable>
+          )}
+
+          {erroreFoto ? (
+            <View>
+              <Text style={styles.errore}>{erroreFoto}</Text>
+              {permessoNegatoDefinitivo && (
+                <Pressable onPress={() => Linking.openSettings()}>
+                  <Text style={styles.linkImpostazioni}>Apri le impostazioni</Text>
+                </Pressable>
+              )}
+            </View>
+          ) : null}
 
           {errore ? <Text style={styles.errore}>{errore}</Text> : null}
 
@@ -147,10 +212,48 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#1a1a1a',
   },
+  bottoneFoto: {
+    borderWidth: 1,
+    borderColor: '#2e7d32',
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  bottoneFotoTesto: {
+    color: '#2e7d32',
+    fontWeight: '600',
+    fontSize: 15,
+  },
+  anteprimaRiga: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  anteprima: {
+    width: 64,
+    height: 64,
+    borderRadius: 10,
+    backgroundColor: '#eee',
+  },
+  bottoneRimuoviFoto: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  bottoneRimuoviFotoTesto: {
+    color: '#c62828',
+    fontWeight: '600',
+    fontSize: 14,
+  },
   errore: {
     color: '#c62828',
     marginTop: 12,
     fontSize: 14,
+  },
+  linkImpostazioni: {
+    color: '#2e7d32',
+    fontWeight: '600',
+    fontSize: 14,
+    marginTop: 6,
   },
   azioni: {
     flexDirection: 'row',
