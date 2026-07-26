@@ -43,3 +43,33 @@ npm run start:tunnel
 ```
 
 Questa modalità è più lenta ma funziona anche su reti diverse, passando attraverso i server di Expo.
+
+## Generare un APK installabile con EAS Build
+
+Per ottenere un file `.apk` da installare direttamente sul telefono (senza passare dal Play Store), il progetto è configurato con un profilo EAS Build dedicato, `preview`, che genera un APK invece dell'AAB usato per la pubblicazione sullo store.
+
+1. Crea un account gratuito su [expo.dev](https://expo.dev) se non ne hai già uno.
+2. Accedi da terminale:
+
+   ```bash
+   npx eas-cli login
+   ```
+
+3. Al primo utilizzo, collega il progetto al tuo account Expo:
+
+   ```bash
+   npx eas-cli init
+   ```
+
+4. Avvia la build dell'APK:
+
+   ```bash
+   npm run build:apk
+   ```
+
+   (equivale a `npx eas-cli build --platform android --profile preview`)
+
+5. La build viene eseguita sui server di Expo (richiede qualche minuto). Al termine, il terminale mostra un link per scaricare il file `.apk`.
+6. Scarica l'APK sul telefono e installalo (potrebbe essere necessario abilitare "Installa da fonti sconosciute" nelle impostazioni Android).
+
+> Nota: `app.json` definisce già `android.package` (`com.heliosmarchelli.listaescursioni`), necessario per la build. Se vuoi pubblicare l'app sul Play Store in futuro, usa invece il profilo `production` (genera un AAB): `npx eas-cli build --platform android --profile production`.
