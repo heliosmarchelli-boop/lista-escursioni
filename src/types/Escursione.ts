@@ -4,4 +4,5 @@ export interface Escursione {
   data: string; // ISO date string (YYYY-MM-DD)
   dislivello: number; // metri
   completata: boolean;
+  fotoUri?: string;
 }

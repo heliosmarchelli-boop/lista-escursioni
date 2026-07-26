@@ -10,22 +10,27 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.heliosmarchelli.listaescursioni",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false,
-      "package": "com.helios85.listaescursioni"
+      "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "c0db2f01-3b14-49b6-a8fd-d54b4b2b68f3"
-      }
-    }
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "L'app usa la galleria per allegare una foto alle tue escursioni.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
+    ]
   }
 }

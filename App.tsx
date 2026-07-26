@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Escursione } from './src/types/Escursione';
 import { caricaEscursioni, salvaEscursioni } from './src/storage/escursioniStorage';
+import { salvaFotoPermanente, eliminaFotoPermanente } from './src/storage/fotoStorage';
 import EscursioneItem from './src/components/EscursioneItem';
 import NuovaEscursioneModal from './src/components/NuovaEscursioneModal';
 
@@ -35,7 +36,9 @@ export default function App() {
   }, []);
 
   function handleAggiungi(nuova: Omit<Escursione, 'id' | 'completata'>) {
-    const escursione: Escursione = { ...nuova, id: generaId(), completata: false };
+    const id = generaId();
+    const fotoUri = nuova.fotoUri ? salvaFotoPermanente(nuova.fotoUri, id) : undefined;
+    const escursione: Escursione = { ...nuova, fotoUri, id, completata: false };
     aggiornaESalva([escursione, ...escursioni]);
     setModaleVisibile(false);
   }
@@ -47,6 +50,8 @@ export default function App() {
   }
 
   function handleCancella(id: string) {
+    const daCancellare = escursioni.find((e) => e.id === id);
+    eliminaFotoPermanente(daCancellare?.fotoUri);
     aggiornaESalva(escursioni.filter((e) => e.id !== id));
   }
 
